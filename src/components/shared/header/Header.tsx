@@ -1,9 +1,31 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useMatchesStore } from "../../../store/useMatchesStore";
 import Loader from "../../ui/Loader";
+import useWindowSize from "../../../hooks/useWindowSize";
+import { toast } from "sonner";
 
 const Header = () => {
     const { error, loading, fetchMatches } = useMatchesStore();
+
+    const { width } = useWindowSize()
+
+    const isMobile = useMemo(() => width <= 545, [width]);
+
+    const notification = () => {
+        toast.error("Ошибка: не удалось загрузить информацию");
+    };
+
+    const errorNotified = useRef(false);
+
+    useEffect(() => {
+        if (error && width <= 1000 && !errorNotified.current) {
+            notification();
+            errorNotified.current = true;
+        }
+        if (!error) {
+            errorNotified.current = false;
+        }
+    }, [error, width]);
 
     const handleRefresh = useCallback(() => {
         fetchMatches(true);
@@ -11,12 +33,22 @@ const Header = () => {
 
     return (
         <header
-            className="flex items-center justify-between h-[100px] flex-wrap gap-[20px]"
+            className="flex items-center justify-between flex-wrap gap-[20px] min-h-[100px]"
+            style={{
+                justifyContent: isMobile ? "center" : "space-between"
+            }}
         >
             <img src="logo.svg" />
-            <div className="flex  items-center gap-[12px]">
-                {error &&
-                    <div className="flex items-center justify-center bg-[#0F1318] w-[480px] h-[56px] p-4 rounded">
+            <div
+                className="flex items-center gap-[12px]"
+                style={{
+                    width: isMobile ? "100%" : "",
+                }}
+            >
+                {error && width > 1039 &&
+                    <div
+                        className="flex items-center justify-center bg-[#0F1318] w-[480px] h-[56px] p-4 rounded"
+                    >
                         <p className="flex items-center gap-[10px] text-[#fff] font-medium">
                             <svg width="28" height="28" viewBox="0 0 28 28" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
@@ -28,10 +60,13 @@ const Header = () => {
                 }
                 <button
                     onClick={handleRefresh}
-                    className="flex items-center justify-center gap-[10px] w-[204px] 
+                    className="flex items-center justify-center gap-[10px] min-w-[204px] 
                     h-[56px] bg-[#EB0237] transition-all hover:bg-[#701328] text-white 
                     font-semibold p-4 rounded cursor-pointer"
                     disabled={loading}
+                    style={{
+                        width: isMobile ? "100%" : "204px"
+                    }}
                 >
                     Обновить {loading && <Loader />}
                 </button>
