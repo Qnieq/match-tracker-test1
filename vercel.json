@@ -1,0 +1,8 @@
+{
+    "rewrites": [
+        {
+            "source": "/api/:path*",
+            "destination": "https://app.ftoyd.com/fronttemp-service:path*"
+        }
+    ]
+}
