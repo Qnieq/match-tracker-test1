@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { fetchMatchesAPI } from '../api/matchApi';
+import { fetchMatchesAPI } from '../components/shared/api/matchApi';
 import { Match } from '../types/match.types';
 
 interface MatchesState {
